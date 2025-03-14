@@ -1,0 +1,21 @@
+# Activar RewriteEngine
+RewriteEngine On
+
+# Redirigir todas las peticiones a index.php si no es un archivo o directorio existente
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.+)$ index.php?url=$1 [QSA,L]
+
+# Eliminar la extensión .php de las URLs
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)$ $1.php [L]
+
+# Proteger archivos sensibles
+<FilesMatch "(^\.|config\.php|db/|includes/)">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+# Desactivar listado de directorios
+Options -Indexes
+

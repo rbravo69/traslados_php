@@ -1,0 +1,71 @@
+
+.bg-gradient {
+    background: linear-gradient(90deg, #7FFFD4, #931b97);
+}
+.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+}
+
+.bg-gradient {
+    background: linear-gradient(90deg, #7FFFD4, #135252);
+}
+.active {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+}
+/* Añadir estilos para el indicador de carga de HTMX */
+.htmx-indicator {
+    display: none;
+}
+.htmx-request .htmx-indicator {
+    display: block;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.911);
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    border-radius: 0.25rem;
+    position: relative;
+}
+.alert-success {
+    background-color: #29975e;
+    border: 1px solid #6ee7b7;
+    color: #3ead8e;
+}
+.alert-danger {
+    background-color: #c04343;
+    border: 1px solid #fca5a5;
+    color: #8f0909;
+}
+.alert-warning {
+    background-color: #d4b122;
+    border: 1px solid #fde68a;
+    color: #a15d33;
+}
+.alert-info {
+    background-color: #215caa;
+    border: 1px solid #93c5fd;
+    color: #576eb9;
+}
+
+nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: #333;
+    padding: 15px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    padding-top: 60px; /* Ajusta el valor según la altura del navbar */
+}
