@@ -45,18 +45,26 @@ try {
     $total_cantidad = 0;
     $total_precio = 0;
     $total_total = 0;
+    $folios_con_comas = '';
     // Generar tabla HTML directamente
     foreach ($folios as $folio) {
         echo "<tr>
-            <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>{$folio['Folio']}</td>
+            <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>". $folio['Folio'] ."</td>
             <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>" . number_format($folio['Cantidad'], 1) . "</td>
             <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>" . number_format($folio['PrecioUnitario'], 4) . "</td>
             <td class='px-6 py-4 whitespace-nowrap text-sm text-gray-900'>" . number_format($folio['Total'], 2) . "</td>
         </tr>";
+        //agregarle coma a los folios
+        $folios_con_comas .= $folio['Folio'] . ',';
         $total_cantidad += $folio['Cantidad'];
         $total_precio += $folio['PrecioUnitario'];  
         $total_total += $folio['Total'];
     }
+
+       // Eliminar la última coma
+       $folios_con_comas = rtrim($folios_con_comas, ',');
+    // Agregar los totales al formulario
+    echo '<input type="hidden" name="folios_almonedas" value="'. $folios_con_comas.'" />';
     echo '<input type="hidden" name="total_cantidad" value="'. $total_cantidad.'" />';
     echo '<input type="hidden" name="total_precio" value="'. $total_precio .' "/>';
     echo '<input type="hidden" name="total_total" value="'. $total_total .' "/>';
@@ -67,12 +75,4 @@ try {
 }
 ?>
 
-<input type="text" name="folios_almonedas" id="folios_almonedas"
-    class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-    placeholder="Ingrese los folios separados por coma"
-    hx-get="includes/buscar_folios_mysql.php"
-    hx-trigger="keyup changed delay:500ms"
-    hx-target="#tablaFolios"
-    hx-indicator="#loadingIndicator"
-    hx-params="serialize"
-    autocomplete="off">
+
