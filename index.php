@@ -1,7 +1,7 @@
 <?php
 
-    require_once 'includes/auth.php'; // Verifica si el usuario está logueado
-    requireLogin(); // Si no está autenticado, redirige al login
+    // require_once 'includes/auth.php'; // Verifica si el usuario está logueado
+    // requireLogin(); // Si no está autenticado, redirige al login
     require_once 'includes/header.php'; 
 ?>
 

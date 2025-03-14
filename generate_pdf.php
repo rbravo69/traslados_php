@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/auth.php';
 requireLogin();
 
 require_once __DIR__ . '/config.php'; // Conexión a la base de datos
-require_once __DIR__ . '/vendor/fpdf.php'; // Asegúrate de que FPDF está en la carpeta correcta
+require_once __DIR__ . '/fpdf/fpdf.php'; // Ajusta la ruta según corresponda
 function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursal_origen_id, $sucursal_destino_id, $folios, $cantidad, $total) {
     global $sqlite;
 
@@ -114,7 +114,7 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     }
 
     // Guardar el PDF con nombre único
-    $nombre_pdf = "traslado_almoneda-".$data['sucursal_origen']."-" .date("Ymmd") . ".pdf";
+    $nombre_pdf = "traslado_almoneda-".$data['sucursal_origen']."-" .date("Ymd") . ".pdf";
     $pdf->Output($ruta_pdf . $nombre_pdf, 'F'); // 'F' = Guardar en archivo
 
      // Forzar la descarga del PDF

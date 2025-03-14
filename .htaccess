@@ -12,10 +12,11 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^(.+)$ $1.php [L]
 
 # Proteger archivos sensibles
-<FilesMatch "(^\.|config\.php|db/|includes/)">
+<FilesMatch "(^\.|config\.php|db/|includes/(?!login_logic\.php$).*)">
     Order Allow,Deny
     Deny from all
 </FilesMatch>
+
 # Desactivar listado de directorios
 Options -Indexes
 

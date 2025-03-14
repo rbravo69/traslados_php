@@ -70,8 +70,3 @@
         </div>
     </nav>
     <!-- End Navbar -->
-    <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
-        <?php if (isset($_SESSION['nombre'])): ?>
-            <?= "Hola, " . htmlspecialchars($_SESSION['nombre']); ?>
-        <?php endif; ?>
-    <main>
