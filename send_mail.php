@@ -5,38 +5,54 @@ requireLogin();
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require 'vendor/phpmailer/src/Exception.php';
-require 'vendor/phpmailer/src/PHPMailer.php';
-require 'vendor/phpmailer/src/SMTP.php';
+require __DIR__ . '/vendor/autoload.php';
+//incluir los archivos necesarios para enviar el correo
+ require __DIR__ . '/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+ require __DIR__ . '/vendor/phpmailer/phpmailer/src/Exception.php';
+ require __DIR__ . '/vendor/phpmailer/phpmailer/src/SMTP.php';
+function enviarCorreo($nombre_pdf) {
+    $mail = new PHPMailer(true);
 
-$mail = new PHPMailer(true);
+    try {
+        // Habilitar depuración de PHPMailer
+        $mail->SMTPDebug = 2;  // 0 = Off, 1 = Mensajes, 2 = Detalles
+        $mail->Debugoutput = 'html'; // Muestra la salida en formato HTML
 
-$archivo_pdf = pathinfo($_FILES['archivo']['name'], PATHINFO_EXTENSION);
+        // Configuración del servidor SMTP
+        $mail->isSMTP();
+        $mail->Host = 'smtp.office365.com'; // Outlook
+        $mail->SMTPAuth = true;
+        $mail->Username = 'traslado_almonedas@outlook.com';
+        $mail->Password = 'traslados'; // Asegúrate de que es correcto
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; // TLS obligatorio en Outlook
+        $mail->Port = 587;
 
-try {
-    // Configuración del servidor SMTP de Outlook
-    $mail->isSMTP();
-    $mail->Host = 'smtp.office365.com';
-    $mail->SMTPAuth = true;
-    $mail->Username = 'traslado_almonedas@outlook.com';
-    $mail->Password = 'traslados';
-    $mail->SMTPSecure = 'tls';
-    $mail->Port = 587;
+        // Configuración del correo
+        $mail->setFrom('traslado_almonedas@outlook.com', 'Sistema de Traslados');
+        $mail->addAddress('rbravo69@gmail.com');
 
-    // Configuración del correo
-    $mail->setFrom('traslado_almonedas@outlook.com', 'sistema de traslados de almoneda');
-    $mail->addAddress('destino@gmail.com');
+        // Adjuntar PDF
+        $ruta_pdf = __DIR__ . '/../documentos/' . $nombre_pdf;
+        if (file_exists($ruta_pdf)) {
+            $mail->addAttachment($ruta_pdf);
+        } else {
+            echo "Error: No se encontró el archivo PDF en $ruta_pdf";
+            return;
+        }
 
-    // Adjuntar archivo PDF
-    $mail->addAttachment('./documents/', $archivo_pdf);
+        $mail->isHTML(true);
+        $mail->Subject = 'Reporte de Traslado';
+        $mail->Body = '<p>Se adjunta el reporte de traslado.</p>';
 
-    $mail->isHTML(true);
-    $mail->Subject = 'Reporte de Equipos';
-    $mail->Body = 'Este es un mensaje de prueba.';
-
-    $mail->send();
-    echo 'Correo enviado';
-} catch (Exception $e) {
-    echo "Error al enviar correo: {$mail->ErrorInfo}";
+        // Enviar el correo
+        if ($mail->send()) {
+            echo 'Correo enviado correctamente.';
+        } else {
+            echo 'Error al enviar correo: ' . $mail->ErrorInfo;
+        }
+    } catch (Exception $e) {
+        echo "Excepción atrapada: {$mail->ErrorInfo}";
+    }
 }
+
 ?>

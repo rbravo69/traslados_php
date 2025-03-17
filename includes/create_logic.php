@@ -5,6 +5,7 @@ require_once __DIR__ . '/functions.php'; // Agregamos las funciones de seguridad
 require_once __DIR__ . '/auth.php'; // Verifica si el usuario está logueado
 requireLogin(); // Si no está autenticado, redirige al login
 include __DIR__ . '/../generate_pdf.php'; // incluir el generate_pdf.php
+require_once __DIR__ . '/../send_mail.php'; // incluir el send_mail.php
 
 // Obtener datos necesarios
 $empresas = $sqlite->query("SELECT * FROM empresas")->fetchAll(PDO::FETCH_ASSOC);
@@ -82,11 +83,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
             $success = "Traslado registrado correctamente.\n PDF generado: $nombre_pdf";
+         
+            // Enviar correo electrónico con el PDF adjunto
+            enviarCorreo( $nombre_pdf);
+            
         } else {
             $errors[] = "Error al guardar el traslado.";
         }
-          // Obtener el ID del traslado recién insertado
-          $traslado_id = $sqlite->lastInsertId();
 
     }
 }

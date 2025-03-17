@@ -115,7 +115,7 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Num. Licencia:', 1, 0, 'L', true);
     $pdf->SetFont('Arial', '', 10);
-    $pdf->Cell(0, 10, $personal["licencia"], 1, 1, 'L');
+    $pdf->Cell(0, 10, $personal["num_licencia"], 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
@@ -239,7 +239,7 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     header('Content-Type: application/pdf');
     header('Content-Disposition: attachment; filename="' . $nombre_pdf . '"');
     readfile($ruta_completa);
-
+    return $nombre_pdf;
     exit; // Terminar la ejecución después de enviar el PDF
 }
 ?>
