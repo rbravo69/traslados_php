@@ -10,9 +10,9 @@
     $mailer = new Swift_Mailer($transport);
     
     // Crear mensaje
-    $message = (new Swift_Message('pruenba de correo'))
+    $message = (new Swift_Message('prueba de correo'))
         ->setFrom(['rbravo69@gmail.com' => 'Sistema de Traslados'])
-        ->setTo(['rabraso@outlook.com' => 'Destinatario'])
+        ->setTo(['sedem@gruposedem.com.mx' => 'Destinatario'])
         ->setBody('Este es el cuerpo del mensaje.')
         ->attach(Swift_Attachment::fromPath('./documents/traslado_almoneda-Uman-20250317.pdf'));
     

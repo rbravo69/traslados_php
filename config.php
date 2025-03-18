@@ -17,7 +17,7 @@ $mysql_host = isset($_SESSION['ip_servidor']) ? $_SESSION['ip_servidor'] : 'loca
 $mysql_user = "root"; // Cambia si tienes otro usuario
 $mysql_pass = "admin"; // Agrega la contraseña si aplica
 $mysql_db = "basedatos"; // Nombre de la base de datos
-$mysql_port = "3307"; // Puerto de MySQL
+$mysql_port = "3306"; // Puerto de MySQL
 
 try {
     $mysql = new PDO("mysql:host=$mysql_host;port=$mysql_port;dbname=$mysql_db;charset=utf8", $mysql_user, $mysql_pass, [

@@ -85,7 +85,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $success = "Traslado registrado correctamente.\n PDF generado: $nombre_pdf";
          
             // Enviar correo electrónico con el PDF adjunto
-            enviarCorreo( $nombre_pdf);
+           $resultado =  enviarCorreo( $nombre_pdf);
+           $success .= "\n" . $resultado;
             
         } else {
             $errors[] = "Error al guardar el traslado.";
