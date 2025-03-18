@@ -18,24 +18,21 @@
                 </div>
 
                 <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6">
-                <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>"> <!-- Token CSRF -->
-                    <?php if (!empty($errors)): ?>
-                        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-                            <strong >¡Errores en el formulario!</strong>
-                            <ul>
-                                <?php foreach ($errors as $error): ?>
-                                    <li><?= htmlspecialchars($error) ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+                <?php if (!empty($success)): ?>
+                    <div class="success">
+                        <?php echo nl2br(htmlspecialchars($success)); ?>
+                    </div>
+                <?php endif; ?>
 
-                    <?php if ($success): ?>
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-                            <?= htmlspecialchars($success) ?>
-                        </div>
-                    <?php endif; ?>
-
+                <?php if (!empty($errors)): ?>
+                    <div class="errors">
+                        <?php foreach ($errors as $error): ?>
+                            <p><?php echo htmlspecialchars($error); ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+                    <!-- Token CSRF -->
+                    <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Empresa -->
                         <div>
@@ -81,7 +78,6 @@
                                 <?php endforeach; ?>
                             </select>
                         </div>
-
                         <!-- Sucursal de Origen -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Sucursal de Origen</label>

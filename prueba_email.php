@@ -1,30 +1,26 @@
 <?php
-    require_once 'vendor/autoload.php';
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mime\Email;
 
-    // Configuración del transporte SMTP
-    $transport = (new Swift_SmtpTransport('smtp.gmail.com', 587, 'tls'))
-        ->setUsername('rbravo69@gmail.com')
-        ->setPassword('ffke czcr arhj ypbz'); // Usa una App Password si tienes 2FA
-    
-    // Crear el Mailer usando el transporte
-    $mailer = new Swift_Mailer($transport);
-    
-    // Crear mensaje
-    $message = (new Swift_Message('prueba de correo'))
-        ->setFrom(['rbravo69@gmail.com' => 'Sistema de Traslados'])
-        ->setTo(['sedem@gruposedem.com.mx' => 'Destinatario'])
-        ->setBody('Este es el cuerpo del mensaje.')
-        ->attach(Swift_Attachment::fromPath('./documents/traslado_almoneda-Uman-20250317.pdf'));
-    
-    // Enviar correo
-    $result = $mailer->send($message);
-    
-    if ($result) {
-        echo "Correo enviado correctamente.";
-    } else {
-        echo "Error al enviar el correo.";
-    }
-    
+require 'vendor/autoload.php';
 
+// Configurar el transporte SMTP de Gmail
+$transport = Transport::fromDsn('smtp://trasladosalmonedas7@gmail.com:rchmnuwyjjnckqgn@smtp.gmail.com:587');
+
+// Crear el objeto Mailer
+$mailer = new Mailer($transport);
+
+// Crear el correo
+$email = (new Email())
+    ->from('trasladosalmonedas7@gmail.com')
+    ->to('rabraso@outlook.com')
+    ->subject('Correo con Symfony Mailer')
+    ->html('<h1>Hola, este es un correo de prueba</h1>');
+
+// Enviar el correo
+$mailer->send($email);
+
+echo 'Correo enviado correctamente con Symfony Mailer.';
 
 ?>

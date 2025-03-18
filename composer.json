@@ -1,6 +1,7 @@
 {
     "require": {
         "fpdf/fpdf": "^1.86",
-        "swiftmailer/swiftmailer": "^6.3"
+        "swiftmailer/swiftmailer": "^6.3",
+        "symfony/mailer": "^7.2"
     }
 }
