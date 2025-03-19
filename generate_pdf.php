@@ -6,6 +6,31 @@ requireLogin();
 require_once __DIR__ . '/config.php'; // Conexión a la base de datos
 require_once __DIR__ . '/fpdf/fpdf.php'; // Ajusta la ruta según corresponda
 
+class PDF extends FPDF
+{
+    // Cabecera de página
+    function Header()
+    {
+        // Arial bold 15
+        $this->SetFont('Arial', 'B', 15);
+        // Título
+        $this->Cell(0, 10, 'Reporte de Traslado', 0, 1, 'C');
+        // Salto de línea
+        $this->Ln(10);
+    }
+
+    // Pie de página
+    function Footer()
+    {
+        // Posición a 1.5 cm del final
+        $this->SetY(-15);
+        // Arial italic 8
+        $this->SetFont('Arial', 'I', 8);
+        // Número de página
+        $this->Cell(0, 10, 'Página ' . $this->PageNo(), 0, 0, 'C');
+    }
+}
+
 function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursal_origen_id, $sucursal_destino_id, $folios, $cantidad, $total) {
     global $sqlite;
 
@@ -40,14 +65,14 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     if (!$data) {
         return null;
     }
+
     // Crear PDF
-    $pdf = new FPDF();
+    $pdf = new PDF();
     $pdf->AddPage();
     
     // Cargar una fuente compatible con UTF-8
-    $pdf->AddFont('DejaVu','','DejaVuSans.ttf',true);
-    $pdf->SetFont('DejaVu','',14);
-    
+    $pdf->AddFont('DejaVuSans', '', 'DejaVuSans.php');
+
     $pdf->SetFont('Arial', 'B', 16);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(0, 10, 'Reporte de Traslado', 0, 1, 'C');
@@ -57,13 +82,13 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Fecha:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($fecha_traslado), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Codigo Seguridad:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($data['codigo_seguridad']), 1, 1, 'L');
     
     // Datos de la empresa
@@ -73,19 +98,19 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFillColor(96, 176, 132);
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->Cell(50, 10, 'Empresa:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($data['empresa']), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'RFC:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($data['rfc']), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Direccion:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($data['direccion']), 1, 1, 'L');
     
     // Datos del traslado
@@ -95,13 +120,13 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFont('Arial', 'B', 12);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Sucursal Origen:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 12);
+    $pdf->SetFont('DejaVuSans', '', 12);
     $pdf->Cell(0, 10, utf8_decode($data['sucursal_origen']), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Sucursal Destino:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($data['sucursal_destino']), 1, 1, 'L');
     
     // Detalles del personal
@@ -112,25 +137,25 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFont('Arial', '', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Nombre:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($personal["nombre"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Num. Licencia:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($personal["num_licencia"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Num. Empleado:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($personal["num_empleado"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Seguro Social (IMSS):', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($personal["nss"]), 1, 1, 'L');
     
     // Detalles de los vehículos
@@ -142,37 +167,37 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFont('Arial', '', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Marca:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["marca"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Modelo:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["modelo"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Color:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["color"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Placas:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', 'B', 10);
+    $pdf->SetFont('DejaVuSans', 'B', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["placas"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Num. Serie:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["num_serie"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Num. Motor:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["num_motor"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 14);
@@ -180,20 +205,20 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->Cell(0, 10, 'Datos del Seguro', 1, 1, 'C', true);
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
-    $pdf->Cell(50, 10, 'Compañia:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->Cell(50, 10, 'Compañia de seguros:', 1, 0, 'L', true);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["aseguradora"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Poliza:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["num_poliza"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Vigencia:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($vehiculos["fecha_vencimiento"]), 1, 1, 'L');
     
     // Detalles de los folios de almoneda
@@ -203,7 +228,7 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Folios:', 1, 0, 'L', true);
-    $pdf->SetFont('Arial', '', 10);
+    $pdf->SetFont('DejaVuSans', '', 10);
     $pdf->Cell(0, 10, utf8_decode($data["folio"]), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
