@@ -82,12 +82,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $folios_almonedas, $total_cantidad, $total_total);
 
 
-            $success = "Traslado registrado correctamente.\n PDF generado: $nombre_pdf";
+            $registro = "Traslado registrado correctamente.\n PDF generado: $nombre_pdf";
          
             // Enviar correo electrónico con el PDF adjunto
            $resultado =  enviarCorreo( $nombre_pdf);
-           $success .= "\n" . $resultado;
-            
+           $success = $registro."\n" . $resultado;
+
+            // 🔹 Redirigir para limpiar los campos del formulario
+            // header("Location: ".$_SERVER['PHP_SELF']);
+            // exit;
         } else {
             $errors[] = "Error al guardar el traslado.";
         }

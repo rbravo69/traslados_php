@@ -17,20 +17,26 @@
                     <h2 class="text-3xl font-extrabold text-center tracking-wide">Crear Nuevo Traslado</h2>
                 </div>
 
-                <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6">
+                <!-- Sección de notificaciones -->
                 <?php if (!empty($success)): ?>
-                    <div class="success">
-                        <?php echo nl2br(htmlspecialchars($success)); ?>
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Éxito!</strong>
+                        <span class="block sm:inline"><?php echo nl2br(htmlspecialchars($success)); ?></span>
                     </div>
                 <?php endif; ?>
 
                 <?php if (!empty($errors)): ?>
-                    <div class="errors">
-                        <?php foreach ($errors as $error): ?>
-                            <p><?php echo htmlspecialchars($error); ?></p>
-                        <?php endforeach; ?>
+                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+                        <strong class="font-bold">Error!</strong>
+                        <span class="block sm:inline">
+                            <?php foreach ($errors as $error): ?>
+                                <p><?php echo htmlspecialchars($error); ?></p>
+                            <?php endforeach; ?>
+                        </span>
                     </div>
                 <?php endif; ?>
+
+                <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6" id="trasladoForm">
                     <!-- Token CSRF -->
                     <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -153,5 +159,13 @@
         </div>
     </div>
 </div>
+
+<script>
+function limpiarCampos() {
+    if (<?php if (!empty($success))  ?>) {
+        document.getElementById('trasladoForm').reset();
+    }
+}
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
