@@ -162,7 +162,7 @@
 
 <script>
 function limpiarCampos() {
-    if (<?php if (!empty($success))  ?>) {
+    if (<?php if (!empty($errors))  ?>) {
         document.getElementById('trasladoForm').reset();
     }
 }

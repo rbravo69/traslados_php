@@ -3,10 +3,14 @@ require_once __DIR__ . '/auth.php'; // Verifica si el usuario está logueado
 requireLogin();
 require_once __DIR__ . '/../config.php';
 
+if(isset($_SESSION['sucursal_id'])){
+    $sucursal_usuario = $_SESSION['sucursal_id'];
+} else {
+    $sucursal_usuario = 1;
+}
 // Obtener filtros si existen
 $fecha = isset($_GET['fecha']) ? $_GET['fecha'] : null;
-$sucursal_origen_id = isset($_GET['sucursal_origen_id']) ? $_GET['sucursal_origen_id'] : null;
-$sucursal_destino_id = isset($_GET['sucursal_destino_id']) ? $_GET['sucursal_destino_id'] : null;
+$sucursal_origen_id = isset($_GET['sucursal_origen_id']) ? $_GET['sucursal_origen_id'] : $sucursal_usuario;
 
 // Construir la consulta SQL con filtros dinámicos
 $query = "SELECT 
@@ -33,10 +37,6 @@ if ($fecha) {
 if ($sucursal_origen_id) {
     $query .= " AND t.sucursal_origen_id = ?";
     $params[] = $sucursal_origen_id;
-}
-if ($sucursal_destino_id) {
-    $query .= " AND t.sucursal_destino_id = ?";
-    $params[] = $sucursal_destino_id;
 }
 
 // Ordenar por fecha descendente

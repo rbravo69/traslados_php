@@ -10,6 +10,16 @@ try {
 } catch (PDOException $e) {
     die("Error al conectar con SQLite: " . $e->getMessage());
 }
+$port=0;
+if(isset($_SESSION['sucursal_id'])){
+    if($_SESSION["sucursal_id"]==1){
+        $port = 3306;
+    } else {
+        $port = 3307;
+    }
+} else {
+
+}
 
 if(isset($_SESSION['ip_servidor'])){
    // Si el usuario está logueado, obtener la IP del servidor MySQL según su sucursal
@@ -17,7 +27,7 @@ $mysql_host = isset($_SESSION['ip_servidor']) ? $_SESSION['ip_servidor'] : 'loca
 $mysql_user = "root"; // Cambia si tienes otro usuario
 $mysql_pass = "admin"; // Agrega la contraseña si aplica
 $mysql_db = "basedatos"; // Nombre de la base de datos
-$mysql_port = "3306"; // Puerto de MySQL
+$mysql_port = $port; // Puerto de MySQL
 
 try {
     $mysql = new PDO("mysql:host=$mysql_host;port=$mysql_port;dbname=$mysql_db;charset=utf8", $mysql_user, $mysql_pass, [
