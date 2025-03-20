@@ -17,7 +17,7 @@ require_once __DIR__ . '/../includes/consulta_traslados_logic.php';
         <div class="flex space-x-4">
             <div>
                 <label for="fecha" class="block text-gray-700">Fecha:</label>
-                <input type="date" name="fecha" id="fecha" class="border rounded p-2" value="<?= htmlspecialchars($fecha) ?>">
+                <input type="date" name="fecha" id="fecha" class="border rounded p-2" value="<?=$fecha ?>">
             </div>
             <div>
                 <label for="sucursal_origen_id" class="block text-gray-700">Sucursal de Origen:</label>

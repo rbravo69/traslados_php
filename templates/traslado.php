@@ -117,7 +117,7 @@
                             <input type="text" name="folios_almonedas" id="folios_almonedas"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
                                 placeholder="Ingrese los folios separados por coma"
-                                hx-get="/../includes/buscar_folios_mysql.php"
+                                hx-get="./../includes/buscar_folios_mysql.php"
                                 hx-trigger="keyup changed delay:500ms"
                                 hx-target="#tablaFolios"
                                 hx-indicator="#loadingIndicator"
@@ -161,11 +161,14 @@
 </div>
 
 <script>
-function limpiarCampos() {
-    if (<?php if (!empty($errors))  ?>) {
-        document.getElementById('trasladoForm').reset();
+  <?php
+    if (isset($_SESSION['mensaje'])) {
+        $mensaje = $_SESSION['mensaje'];
+        $tipoMensaje = $_SESSION['tipo_mensaje'];
+        echo "toastr.$tipoMensaje('$mensaje');"; // Muestra la notificación con el tipo correcto (success/error)
+        unset($_SESSION['mensaje'], $_SESSION['tipo_mensaje']); // Eliminar el mensaje después de mostrarlo
     }
-}
+    ?>
 </script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

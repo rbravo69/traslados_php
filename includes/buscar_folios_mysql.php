@@ -29,6 +29,7 @@ try {
         LEFT JOIN basedatos.detallesentradainventario di 
             ON ei.ID = di.IDEntrada OR ei.ID = di.ContratoPrincipal
         WHERE ei.Folio IN ($foliosString)
+        and  di.tipoSalida = 2
         GROUP BY ei.Folio
     ";
 
@@ -37,7 +38,8 @@ try {
     $stmt = $mysql->prepare($query);
     $stmt->execute();
     $folios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    //$stmt->closeCursor();
+    
     if (empty($folios)) {
         echo "<tr><td colspan='4' class='text-red-500 text-center'>No se encontraron folios en MySQL</td></tr>";
         exit;

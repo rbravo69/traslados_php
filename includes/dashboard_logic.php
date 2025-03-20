@@ -42,4 +42,6 @@ $detalleTraslados = $sqlite->query($query)->fetchAll(PDO::FETCH_ASSOC);
 $filtro = $sucursal_id != 1 ? "WHERE id = $sucursal_id" : "";
 $query = "SELECT id, nombre FROM sucursales $filtro ";
 $sucursales = $sqlite->query($query)->fetchAll(PDO::FETCH_ASSOC);
+$sqlite=null;
+
 ?>

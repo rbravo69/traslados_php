@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/auth.php'; // Verifica si el usuario está logueado
+require_once __DIR__ . '/auth.php';
+// Verifica si el usuario está logueado
 requireLogin();
 require_once __DIR__ . '/../config.php';
 
@@ -46,7 +47,9 @@ $query .= " ORDER BY t.fecha_traslado DESC";
 $stmt = $sqlite->prepare($query);
 $stmt->execute($params);
 $traslados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->closeCursor();
 
 // Obtener sucursales para los filtros
 $sucursales = $sqlite->query("SELECT * FROM sucursales")->fetchAll(PDO::FETCH_ASSOC);
+$sqlite=null;
 ?>

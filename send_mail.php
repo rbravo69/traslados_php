@@ -25,7 +25,7 @@ function enviarCorreo($archivo)
         ->from('trasladosalmonedas7@gmail.com')
         ->to('rabraso@outlook.com')
         ->subject('TRASLADO DE ALMONEDA')
-        ->html('<p>Se ha enviado un correo desde el sistema de traslados, enviando el PDF para la generacion de la carta porte.</p>')
+        ->html('<p>Se ha enviado un correo desde el sistema de traslados,\n enviando el PDF para la generacion de la carta porte.</p>')
         ->attachFromPath($ruta_archivo);
 
     // Enviar el correo

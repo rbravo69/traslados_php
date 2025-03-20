@@ -1,11 +1,11 @@
 <?php
-require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/functions.php'; // Agregamos las funciones de seguridad
+require_once __DIR__ .'/../config.php';
+require_once __DIR__ .'/functions.php'; // Agregamos las funciones de seguridad
 
-require_once __DIR__ . '/auth.php'; // Verifica si el usuario está logueado
+require_once __DIR__ .'/auth.php'; // Verifica si el usuario está logueado
 requireLogin(); // Si no está autenticado, redirige al login
-include __DIR__ . '/../generate_pdf.php'; // incluir el generate_pdf.php
-require_once __DIR__ . '/../send_mail.php'; // incluir el send_mail.php
+include  __DIR__ .'/../generate_pdf.php'; // incluir el generate_pdf.php
+require_once __DIR__. '/../send_mail.php'; // incluir el send_mail.php
 
 // Obtener datos necesarios
 $empresas = $sqlite->query("SELECT * FROM empresas")->fetchAll(PDO::FETCH_ASSOC);
@@ -87,11 +87,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             // Enviar correo electrónico con el PDF adjunto
            $resultado =  enviarCorreo( $nombre_pdf);
            $success = $registro."\n" . $resultado;
-
+           $_SESSION['mensaje'] = $success;
+           $_SESSION['tipo_mensaje'] = "success"; // 'success' o 'error'
             // 🔹 Redirigir para limpiar los campos del formulario
             // header("Location: ".$_SERVER['PHP_SELF']);
             // exit;
         } else {
+            $_SESSION["mensaje"] = "Error al guardar el traslado.";
+            $_SESSION["tipo_mensaje"] = "error"; // 'success' o 'error'
             $errors[] = "Error al guardar el traslado.";
         }
 
