@@ -1,9 +1,34 @@
 <?php
+    header('Content-Type: application/json');
     require_once 'auth.php';
     requireLogin();
-    require_once __DIR__ . '/../config.php';
+    //require_once __DIR__ . '/../config.php';
 
-    header('Content-Type: application/json');
+
+
+
+
+    
+if(isset($_SESSION['ip_servidor'])){
+    // Si el usuario está logueado, obtener la IP del servidor MySQL según su sucursal
+     $mysql_host = isset($_SESSION['ip_servidor']) ? $_SESSION['ip_servidor'] : 'localhost';
+     $mysql_user = "root"; // Cambia si tienes otro usuario
+     $mysql_pass = "admin"; // Agrega la contraseña si aplica
+     $mysql_db = "basedatos"; // Nombre de la base de datos
+     $mysql_port = 3307; // Puerto de MySQL
+ 
+     try {
+         $mysql = new PDO("mysql:host=$mysql_host;port=$mysql_port;dbname=$mysql_db;charset=utf8", $mysql_user, $mysql_pass, [
+             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+         ]);
+     } catch (PDOException $e) {
+         die("Error al conectar con MySQL en $mysql_host: " . $e->getMessage());
+     }
+ }else {
+     $sucursal = null;
+     exit;
+ }
 
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         echo json_encode(['error' => 'Método no permitido']);
@@ -12,6 +37,7 @@
 
     $input = json_decode(file_get_contents('php://input'), true);
     $folioTexto = $input['folios'] ?? '';
+    dump($folioTexto);
 
     if (empty($folioTexto)) {
         echo json_encode(['error' => 'No se recibieron folios']);
@@ -48,9 +74,9 @@
         $stmt = $mysql->prepare($query);
         $stmt->execute($folioNumeros);
         $folios = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $stmt->closeCursor();
+        //$stmt->closeCursor();
         if (empty($folios)) {
-            echo json_encode(['error' => 'No se encontraron folios']);
+            echo json_encode(['error' => 'No se encontraron folios'],['Folios' => $placeholders]);
             exit;
         }
 

@@ -16,25 +16,9 @@
                 <div class="bg-indigo-600 text-white py-4 px-6">
                     <h2 class="text-3xl font-extrabold text-center tracking-wide">Crear Nuevo Traslado</h2>
                 </div>
+                <?= $_SESSION['ip_servidor'].'- '. $_SESSION['sucursal'] ; ?>
 
-                <!-- Sección de notificaciones -->
-                <?php if (!empty($success)): ?>
-                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                        <strong class="font-bold">Éxito!</strong>
-                        <span class="block sm:inline"><?php echo nl2br(htmlspecialchars($success)); ?></span>
-                    </div>
-                <?php endif; ?>
-
-                <?php if (!empty($errors)): ?>
-                    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                        <strong class="font-bold">Error!</strong>
-                        <span class="block sm:inline">
-                            <?php foreach ($errors as $error): ?>
-                                <p><?php echo htmlspecialchars($error); ?></p>
-                            <?php endforeach; ?>
-                        </span>
-                    </div>
-                <?php endif; ?>
+            <!--Formulario de Traslado-->
                 <div x-data="{ cargando: false }">
                 <form method="POST" 
                     action="traslado.php" 
@@ -114,7 +98,7 @@
                         </div>
                     </div>
                     <!-- Sección de Folios usando Alpine con Mysql -->
-                    <div x-data="foliosAlmonedas()" x-init="init()">
+                    <div x-data="foliosAlmonedas()" x-init="init()" x-id="foliosAlmonedas" >
                         <div class="form-group mt-6">
                             <label for="folios_almonedas" class="block text-sm font-medium text-gray-700 mb-2">Folios de Almonedas</label>
 
@@ -130,7 +114,7 @@
                                 autocomplete="off">
 
                             <!-- 🔄 Indicador de carga (oculta la tabla mientras se cargan datos) -->
-                            <div x-show="cargando" class="text-center mt-4 text-indigo-600">
+                            <div x-show="!cargandoFolios" class="text-center mt-4 text-indigo-600">
                                 <div class="inline-flex items-center space-x-2">
                                     <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -141,7 +125,7 @@
                             </div>
 
                             <!-- Tabla de resultados -->
-                            <div class="overflow-x-auto mt-4" x-show="!cargando">
+                            <div class="overflow-x-auto mt-4" x-show="cargandoFolios">
                                 <template x-if="folios.length > 0">
                                     <table class="min-w-full divide-y divide-gray-200">
                                         <thead>
@@ -225,15 +209,17 @@ function foliosAlmonedas() {
     return {
         folioInput: '',
         folios: [],
-        cargando: false,
+        cargandoFolios: false,
+        cargando: false, // Asegúrate de inicializar cargando como false
         init() {},
         buscarFolios() {
             if (!this.folioInput.trim()) {
                 this.folios = [];
                 return;
             }
-
-            this.cargando = true;
+            console.log(this.folioInput);
+            
+            this.cargandoFolios = true;
             fetch('./../includes/buscar_folios_mysql.php', {
                 method: 'POST',
                 headers: {
@@ -244,20 +230,28 @@ function foliosAlmonedas() {
             })
             .then(res => res.json())
             .then(data => {
-                this.folios = data;
+                // Verifica si la respuesta es un array
+                if (Array.isArray(data)) {
+                    this.folios = data;
+                } else {
+                    console.error('La respuesta no es un array:', data);
+                    this.folios = [];
+                }
+                console.log(data);
             })
             .catch(error => {
                 console.error('Error al buscar folios:', error);
                 this.folios = [];
             })
             .finally(() => {
-                this.cargando = false;
+                this.cargandoFolios = false;
             });
         }
     };
 }
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
+
+
