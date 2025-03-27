@@ -35,8 +35,12 @@
                         </span>
                     </div>
                 <?php endif; ?>
-
-                <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6" id="trasladoForm">
+                <div x-data="{ cargando: false }">
+                <form method="POST" 
+                    action="traslado.php" 
+                    class="p-6 md:p-8 space-y-6" 
+                    id="trasladoForm"
+                    @submit="cargando = true">
                     <!-- Token CSRF -->
                     <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -109,52 +113,98 @@
                             </select>
                         </div>
                     </div>
-                    <!-- Sección de Folios usando HTMX con MySQL -->
+                    <!-- Sección de Folios usando Alpine con Mysql -->
+                    <div x-data="foliosAlmonedas()" x-init="init()">
                         <div class="form-group mt-6">
                             <label for="folios_almonedas" class="block text-sm font-medium text-gray-700 mb-2">Folios de Almonedas</label>
-                            
-                            <!-- Campo para ingresar los folios -->
-                            <input type="text" name="folios_almonedas" id="folios_almonedas"
+
+                            <!-- Input de búsqueda -->
+                            <input 
+                                type="text" 
+                                name="folios_almonedas" 
+                                id="folios_almonedas"
+                                x-model="folioInput"
+                                @input.debounce.500ms="buscarFolios()"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                                placeholder="Ingrese los folios separados por coma"
-                                hx-get="./../includes/buscar_folios_mysql.php"
-                                hx-trigger="keyup changed delay:500ms"
-                                hx-target="#tablaFolios"
-                                hx-indicator="#loadingIndicator"
-                                hx-include="[name='folios_almonedas']"
+                                placeholder="Ingrese los folios separados por coma ejemplo: 123, 456, 789"
                                 autocomplete="off">
 
-
-                            
-                            <!-- Indicador de carga -->
-                            <div id="loadingIndicator" class="text-center mt-2" style="display: none;">
-                                <span class="text-gray-600">Cargando desde MySQL...</span>
+                            <!-- 🔄 Indicador de carga (oculta la tabla mientras se cargan datos) -->
+                            <div x-show="cargando" class="text-center mt-4 text-indigo-600">
+                                <div class="inline-flex items-center space-x-2">
+                                    <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                                    </svg>
+                                    <span>Cargando folios de almonedas...</span>
+                                </div>
                             </div>
 
-                            <!-- Tabla donde se mostrarán los folios -->
-                            <div class="overflow-x-auto mt-2">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                        <tr>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Folio</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Cantidad</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Precio Unitario</th>
-                                            <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tablaFolios">
-                                        <!-- Aquí HTMX insertará los datos dinámicamente con PHP -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                            <!-- Tabla de resultados -->
+                            <div class="overflow-x-auto mt-4" x-show="!cargando">
+                                <template x-if="folios.length > 0">
+                                    <table class="min-w-full divide-y divide-gray-200">
+                                        <thead>
+                                            <tr>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Folio</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Cantidad</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Precio Unitario</th>
+                                                <th class="px-6 py-3 text-left text-xs font-medium text-white uppercase bg-indigo-600">Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <template x-for="folio in folios" :key="folio.folio">
+                                                <tr>
+                                                    <td class="px-6 py-2" x-text="folio.folio"></td>
+                                                    <td class="px-6 py-2" x-text="folio.cantidad"></td>
+                                                    <td class="px-6 py-2" x-text="folio.precio_unitario"></td>
+                                                    <td class="px-6 py-2" x-text="folio.total"></td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </template>
 
-                    <div class="mt-4">
-                        <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded">
-                            Guardar Traslado
+                                <!-- Mensaje si no hay resultados -->
+                                <template x-if="!folios.length && folioInput.trim()">
+                                    <div class="text-center text-gray-500 mt-4">
+                                        No se encontraron folios válidos.
+                                    </div>
+                                </template>
+                            </div>
+    </div>
+</div>
+
+
+                    <!-- Botón para guardar el traslado -->
+                        <div class="mt-4">
+                        <button 
+                            type="submit"
+                            class="w-full px-4 py-2 rounded transition-colors duration-200"
+                            :class="cargando ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'"
+                            :disabled="cargando">
+                            <template x-if="!cargando">Guardar Traslado</template>
+                            <template x-if="cargando">Procesando...</template>
                         </button>
-                    </div>
+                        </div>
                 </form>
+                <div x-show="cargando"
+                    x-transition
+                    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+                    <div class="text-center bg-white p-6 rounded-lg shadow-lg">
+                        <svg class="w-8 h-8 mx-auto text-blue-600 animate-spin mb-4" 
+                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" 
+                                    stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" 
+                                d="M4 12a8 8 0 018-8v8z"></path>
+                        </svg>
+                        <p class="text-gray-800 text-sm">Guardando traslado, por favor espera...</p>
+                    </div>
+
+                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -170,5 +220,44 @@
     }
     ?>
 </script>
+<script>
+function foliosAlmonedas() {
+    return {
+        folioInput: '',
+        folios: [],
+        cargando: false,
+        init() {},
+        buscarFolios() {
+            if (!this.folioInput.trim()) {
+                this.folios = [];
+                return;
+            }
 
+            this.cargando = true;
+            fetch('./../includes/buscar_folios_mysql.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ folios: this.folioInput })
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.folios = data;
+            })
+            .catch(error => {
+                console.error('Error al buscar folios:', error);
+                this.folios = [];
+            })
+            .finally(() => {
+                this.cargando = false;
+            });
+        }
+    };
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>

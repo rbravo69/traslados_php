@@ -89,9 +89,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
            $success = $registro."\n" . $resultado;
            $_SESSION['mensaje'] = $success;
            $_SESSION['tipo_mensaje'] = "success"; // 'success' o 'error'
-            // 🔹 Redirigir para limpiar los campos del formulario
-            // header("Location: ".$_SERVER['PHP_SELF']);
-            // exit;
+            //🔹 Redirigir para limpiar los campos del formulario
+            header("Location: ".$_SERVER['PHP_SELF']);
+            exit;
         } else {
             $_SESSION["mensaje"] = "Error al guardar el traslado.";
             $_SESSION["tipo_mensaje"] = "error"; // 'success' o 'error'
