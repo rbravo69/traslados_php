@@ -15,17 +15,19 @@ function enviarCorreo($archivo)
     }
 
     // Configurar el transporte SMTP de Gmail
-    $transport = Transport::fromDsn('smtp://trasladosalmonedas7@gmail.com:rchmnuwyjjnckqgn@smtp.gmail.com:587');
+    //$transport = Transport::fromDsn('smtp://trasladosalmonedas7@gmail.com:rchmnuwyjjnckqgn@smtp.gmail.com:587');
+    // de grupo de trabajo de gmail
+    $transport = Transport::fromDsn('smtp://soportecnico@tuereselequipo.com:bmbeucddouzsrqdw@smtp.gmail.com:587');
 
     // Crear el objeto Mailer
     $mailer = new Mailer($transport);
 
     // Crear el correo
     $email = (new Email())
-        ->from('trasladosalmonedas7@gmail.com')
-        ->to('rabraso@outlook.com')
+        ->from('soportecnico@tuereselequipo.com')
+        ->to('auxiliar_operaciones@tuereselequipo.com')
         ->subject('TRASLADO DE ALMONEDA')
-        ->html('<p>Se ha enviado un correo desde el sistema de traslados,\n enviando el PDF para la generacion de la carta porte.</p>')
+        ->html('<p>Se ha enviado un correo desde el sistema de traslados,<br/> enviando el PDF para la generacion de la carta porte.</p>')
         ->attachFromPath($ruta_archivo);
 
     // Enviar el correo
