@@ -13,9 +13,10 @@
                 <div class="bg-indigo-600 text-white py-4 px-6">
                     <h2 class="text-3xl font-extrabold text-center tracking-wide">Crear Nuevo Traslado</h2>
                 </div>
+            
                <!-- Alpine unificado -->
-                <div x-data="foliosAlmonedas()";  >
-                    <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6" id="trasladoForm"  @submit.prevent="mostrarOverlayYEnviar">
+                <div x-data="foliosAlmonedas()" >
+                    <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6" id="trasladoForm"  >
                         <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -156,9 +157,9 @@
                         <div class="mt-4 text-center">
                             <button type="submit" class="w-full px-4 py-2 rounded transition-colors duration-200" 
                             :class="cargando ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'" 
-                            :disabled="cargando">
+                            :disabled="cargando" :click="mostrarOverlayYEnviar()">
                                 <span x-show="!cargando">Guardar Traslado</span>
-                                <span x-show="cargando">Procesando...</span>
+                                <span x-show="cargando">Generando el PDF...</span>
                            
                             <svg x-show="cargando" class="animate-spin h-5 w-5 text-white inline-block ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -173,23 +174,40 @@
     </div>
 </div>
 <!-- Overlay de carga de PDF -->
-<div 
-    x-show="guardando" 
+<!-- <div 
+    x-show="!guardando" 
+    x-cloak
     class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    style="backdrop-filter: blur(4px);"
+    style="backdrop-filter: blur(4px);[x-cloak] { display: none; }"
 >
     <div class="bg-white p-6 rounded-lg shadow-lg text-center">
         <svg class="w-10 h-10 text-indigo-600 animate-spin mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
         </svg>
-        <p class="text-gray-700 font-medium">Guardando datos...</p>
+        <p class="text-gray-700 font-medium">Generando el PDF...</p>
     </div>
-</div>
-<!-- Alpine y Toastr -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+</div> -->
+<?php if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'pdf-ok'): ?>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script>
+        
+        // Mostrar el toast
+        Toastify({
+            text: "📄 PDF generado correctamente",
+            duration: 4000,
+            gravity: "bottom", // `top` or `bottom`
+            position: "right",
+            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        }).showToast();
+
+        // Esperar 1 seg y lanzar descarga automática
+        setTimeout(() => {
+            window.location.href = "./../descargar_pdf.php";
+        }, 1000);
+    </script>
+<?php endif; ?>
+
 
 <script>
 function foliosAlmonedas() {
@@ -211,6 +229,7 @@ function foliosAlmonedas() {
         get totalTotal() {
             return this.folios.reduce((acc, f) => acc + parseFloat(f.total || 0), 0);
         },
+
         mostrarOverlayYEnviar() {
             this.guardando = true; // Activar indicador de guardando
             fetch('./../includes/guardar_traslado.php', {
@@ -230,6 +249,7 @@ function foliosAlmonedas() {
             .then(data => {
                 if (data.success) {
                     toastr.success('Traslado guardado exitosamente');
+                    this.limpiarCampos(); // Limpiar los campos después de guardar
                 } else {
                     toastr.error(data.error || 'Error al guardar el traslado');
                 }
@@ -242,6 +262,7 @@ function foliosAlmonedas() {
                 this.guardando = false; // Desactivar indicador de guardando
             });
         },
+
         buscarFolios() {
             this.cargando = true;
             this.error = '';
@@ -272,6 +293,20 @@ function foliosAlmonedas() {
                 this.cargando = false;
             });
         },
+
+        limpiarCampos() {
+            // Restablecer los valores de los campos y variables
+            this.folioInput = '';
+            this.folios = [];
+            this.error = '';
+            this.cargando = false;
+            this.guardando = false;
+            this.generandoPDF = false;
+
+            // Opcional: Limpiar los campos del formulario HTML
+            document.getElementById('trasladoForm').reset();
+        },
+
         formatNumber(value) {
             return Number(value).toLocaleString('es-MX');
         },

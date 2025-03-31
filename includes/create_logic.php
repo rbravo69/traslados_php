@@ -88,13 +88,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['tipo_mensaje'] = "success";
             $_SESSION['archivo_pdf'] = $nombre_pdf;
 
-            header("Location: ./../descargar_pdf.php");
-            exit;
+            // header("Location: ./../descargar_pdf.php");
+            // exit;
            $success = $registro;
            $_SESSION['mensaje'] = $success;
            $_SESSION['tipo_mensaje'] = "success"; // 'success' o 'error'
-            //🔹 Redirigir para limpiar los campos del formulario
-            header("Location: ".$_SERVER['PHP_SELF']);
+           // Redirige después de guardar
+            header("Location: ./traslado.php?mensaje=pdf-ok");
             exit;
         } else {
             $_SESSION["mensaje"] = "Error al guardar el traslado.";

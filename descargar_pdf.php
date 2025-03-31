@@ -7,10 +7,7 @@ if (!isset($_SESSION['archivo_pdf'])) {
 }
 
 $nombreArchivo = $_SESSION['archivo_pdf'];
-$rutaArchivo = __DIR__ . "\\documents\\" . $nombreArchivo;
-echo $nombreArchivo."<br>";
-echo $rutaArchivo."<br>";
-
+$rutaArchivo = __DIR__ . "/documents/" . $nombreArchivo;
 if (!file_exists($rutaArchivo)) {
     die("El archivo no existe.");
 }
@@ -23,5 +20,6 @@ header("Content-Disposition: attachment; filename=\"$nombreArchivo\"");
 header("Content-Length: " . filesize($rutaArchivo));
 readfile($rutaArchivo);
 exit;
+
 
 ?>

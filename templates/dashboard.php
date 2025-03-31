@@ -80,7 +80,7 @@ require_once __DIR__ .'/../includes/header.php';
     // Configuración del gráfico de traslados
     const ctx = document.getElementById('trasladosPorMesChart').getContext('2d');
     new Chart(ctx, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: meses,
             datasets: [{
@@ -100,7 +100,7 @@ require_once __DIR__ .'/../includes/header.php';
     // Configuración del gráfico de almonedas
     const ctxAlmonedas = document.getElementById('almonedasPorMesChart').getContext('2d');
     new Chart(ctxAlmonedas, {
-        type: 'line',
+        type: 'bar',
         data: {
             labels: meses,
             datasets: [{
