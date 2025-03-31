@@ -8,16 +8,7 @@ require_once __DIR__ . '/fpdf/fpdf.php'; // Ajusta la ruta según corresponda
 
 class PDF extends FPDF
 {
-    // Cabecera de página
-    function Header()
-    {
-        // Arial bold 15
-        $this->SetFont('Arial', 'B', 15);
-        // Título
-        $this->Cell(0, 10, 'Reporte de Traslado', 0, 1, 'C');
-        // Salto de línea
-        $this->Ln(10);
-    }
+
 
     // Pie de página
     function Footer()
@@ -240,13 +231,13 @@ function generarYGuardarPDF($traslado_id, $empresa_id, $fecha_traslado, $sucursa
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Precio Unitario:', 1, 0, 'L', true);
     $pdf->SetFont('Arial', '', 10);
-    $pdf->Cell(0, 10, number_format($data["precio_unitario_almonedas"], 2, '.', ','), 1, 1, 'L');
+    $pdf->Cell(0, 10,number_format((float) $data["precio_unitario_almonedas"], 1, '.', ','), 1, 1, 'L');
     
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetFillColor(96, 176, 132);
     $pdf->Cell(50, 10, 'Total:', 1, 0, 'L', true);
     $pdf->SetFont('Arial', '', 10);
-    $pdf->Cell(0, 10, number_format($data["total_almonedas"], 2, '.', ','), 1, 1, 'L');
+    $pdf->Cell(0, 10, number_format((float)$data["total_almonedas"], 2, '.', ','), 1, 1, 'L');
 
     // Crear directorio si no existe
     $ruta_pdf = __DIR__ . '/documents';

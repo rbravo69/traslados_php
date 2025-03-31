@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $sucursal_destino_id = sanitizeInput($_POST['sucursal_destino_id'] ?? '');
     $folios_almonedas = sanitizeInput($_POST['folios_almonedas'] ?? '');
     $total_cantidad = sanitizeInput($_POST['total_cantidad'] ?? '');
-    $total_precio = sanitizeInput($_POST['total_precio'] ?? '');
+    $total_precio = sanitizeInput($_POST['total_precio_unitario'] ?? '');
     $total_total = sanitizeInput($_POST['total_total'] ?? '');
 
     // Validar campos obligatorios
@@ -84,9 +84,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $registro = "Traslado registrado correctamente.\n PDF generado: $nombre_pdf";
          
-            // Enviar correo electrónico con el PDF adjunto
-           $resultado =  enviarCorreo( $nombre_pdf);
-           $success = $registro."\n" . $resultado;
+            $_SESSION['mensaje'] = "Traslado guardado correctamente.";
+            $_SESSION['tipo_mensaje'] = "success";
+            $_SESSION['archivo_pdf'] = $nombre_pdf;
+
+            header("Location: ./../descargar_pdf.php");
+            exit;
+           $success = $registro;
            $_SESSION['mensaje'] = $success;
            $_SESSION['tipo_mensaje'] = "success"; // 'success' o 'error'
             //🔹 Redirigir para limpiar los campos del formulario

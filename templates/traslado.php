@@ -13,11 +13,9 @@
                 <div class="bg-indigo-600 text-white py-4 px-6">
                     <h2 class="text-3xl font-extrabold text-center tracking-wide">Crear Nuevo Traslado</h2>
                 </div>
-                <?= $_SESSION['ip_servidor'] . ' - ' . $_SESSION['sucursal']; ?>
-
-                <!-- Alpine unificado -->
-                <div x-data="foliosAlmonedas()">
-                    <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6" id="trasladoForm" >
+               <!-- Alpine unificado -->
+                <div x-data="foliosAlmonedas()";  >
+                    <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6" id="trasladoForm"  @submit.prevent="mostrarOverlayYEnviar">
                         <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -88,7 +86,11 @@
                                 </select>
                             </div>
                         </div>
-
+                    
+                            <!-- Campos ocultos para enviar resumen -->
+                            <input type="hidden" name="total_cantidad" :value="totalCantidad">
+                            <input type="hidden" name="total_precio_unitario" :value="totalPrecioUnitario">
+                            <input type="hidden" name="total_total" :value="totalTotal">
                         <!-- Folios -->
                         <div class="form-group mt-6" >
                             <label for="folios_almonedas" class="block text-sm font-medium text-gray-700 mb-2">Folios de Almonedas</label>
@@ -138,20 +140,31 @@
                                             </tr>
                                         </template>
                                     </tbody>
+                                    <tfoot class="font-semibold bg-gray-100">
+                                        <tr>
+                                            <td class="px-4 py-2 text-right" colspan="1">Totales:</td>
+                                            <td class="px-4 py-2" x-text="formatNumber(totalCantidad)"></td>
+                                            <td class="px-4 py-2" x-text="formatCurrency(totalPrecioUnitario)"></td>
+                                            <td class="px-4 py-2" x-text="formatCurrency(totalTotal)"></td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
 
                         <!-- Botón para guardar -->
                         <div class="mt-4 text-center">
-                            <button type="submit" class="w-full px-4 py-2 rounded transition-colors duration-200" :class="cargando ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'" :disabled="cargando">
+                            <button type="submit" class="w-full px-4 py-2 rounded transition-colors duration-200" 
+                            :class="cargando ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'" 
+                            :disabled="cargando">
                                 <span x-show="!cargando">Guardar Traslado</span>
                                 <span x-show="cargando">Procesando...</span>
-                            </button>
+                           
                             <svg x-show="cargando" class="animate-spin h-5 w-5 text-white inline-block ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
                             </svg>
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -159,21 +172,76 @@
         </div>
     </div>
 </div>
-
+<!-- Overlay de carga de PDF -->
+<div 
+    x-show="guardando" 
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    style="backdrop-filter: blur(4px);"
+>
+    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+        <svg class="w-10 h-10 text-indigo-600 animate-spin mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        <p class="text-gray-700 font-medium">Guardando datos...</p>
+    </div>
+</div>
 <!-- Alpine y Toastr -->
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.4.10/dist/cdn.min.js" defer></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
 
 <script>
 function foliosAlmonedas() {
-    
     return {
         folioInput: '',
         folios: [],
         cargandoFolios: false,
         cargando: false,
+        guardando: false, // Nuevo estado para "Guardando datos"
         error: '',
+        generandoPDF: false,
+
+        get totalCantidad() {
+            return this.folios.reduce((acc, f) => acc + parseFloat(f.cantidad || 0), 0);
+        },
+        get totalPrecioUnitario() {
+            return this.folios.reduce((acc, f) => acc + parseFloat(f.precio_unitario || 0), 0);
+        },
+        get totalTotal() {
+            return this.folios.reduce((acc, f) => acc + parseFloat(f.total || 0), 0);
+        },
+        mostrarOverlayYEnviar() {
+            this.guardando = true; // Activar indicador de guardando
+            fetch('./../includes/guardar_traslado.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    folios: this.folios,
+                    totalCantidad: this.totalCantidad,
+                    totalPrecioUnitario: this.totalPrecioUnitario,
+                    totalTotal: this.totalTotal
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    toastr.success('Traslado guardado exitosamente');
+                } else {
+                    toastr.error(data.error || 'Error al guardar el traslado');
+                }
+            })
+            .catch(err => {
+                toastr.error('Error al procesar la solicitud');
+                console.error(err);
+            })
+            .finally(() => {
+                this.guardando = false; // Desactivar indicador de guardando
+            });
+        },
         buscarFolios() {
             this.cargando = true;
             this.error = '';
@@ -204,11 +272,9 @@ function foliosAlmonedas() {
                 this.cargando = false;
             });
         },
-
         formatNumber(value) {
             return Number(value).toLocaleString('es-MX');
         },
-
         formatCurrency(value) {
             return Number(value).toLocaleString('es-MX', {
                 style: 'currency',
