@@ -8,12 +8,13 @@ $errors = [];
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Sanitizar entradas
     $username = sanitizeInput($_POST['username']);
     $password = sanitizeInput($_POST['password']);
-
+    echo $username;
+    echo $password;
+    
     // Validar entrada (evitar XSS)
     $username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
 
@@ -34,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Verificar contraseña
         if ($user) {
-            if (password_verify($password, $user['password'])) {
+            if ($password === $user['password']) { // Aquí se debe usar un hash seguro en producción) {
                 //Iniciar sesión de manera segura
                 session_regenerate_id(true);
                 $_SESSION['usuario'] = $user['username'];

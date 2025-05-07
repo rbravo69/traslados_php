@@ -13,14 +13,12 @@
                 <div class="bg-indigo-600 text-white py-4 px-6">
                     <h2 class="text-3xl font-extrabold text-center tracking-wide">Crear Nuevo Traslado</h2>
                 </div>
-            
-               <!-- Alpine unificado -->
-                <div x-data="foliosAlmonedas()" >
-                    <form method="POST" action="traslado.php" class="p-6 md:p-8 space-y-6" id="trasladoForm"  >
+
+                <div x-data="trasladoForm()" class="p-6 md:p-8 space-y-6">
+                    <form method="POST" action="../includes/create_logic.php" id="trasladoForm">
                         <input type="hidden" name="csrf_token" value="<?= generateCSRFToken(); ?>">
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <!-- Empresa -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Empresa</label>
                                 <select name="empresa_id" class="w-full border rounded p-2" required>
@@ -31,19 +29,16 @@
                                 </select>
                             </div>
 
-                            <!-- Fecha de Traslado -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Fecha del Traslado</label>
                                 <input type="date" name="fecha_traslado" class="w-full border rounded p-2" required>
                             </div>
 
-                            <!-- Código de Seguridad -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Código de Seguridad</label>
-                                <input type="text" name="codigo_seguridad" class="w-full border rounded p-2">
+                                <input type="text" name="codigo_seguridad" autocomplete="off" class="w-full border rounded p-2">
                             </div>
 
-                            <!-- Vehículo -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Vehículo</label>
                                 <select name="vehiculo_id" class="w-full border rounded p-2" required>
@@ -54,7 +49,6 @@
                                 </select>
                             </div>
 
-                            <!-- Personal -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Personal de Traslado</label>
                                 <select name="personal_id" class="w-full border rounded p-2" required>
@@ -65,7 +59,6 @@
                                 </select>
                             </div>
 
-                            <!-- Sucursal de Origen -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Sucursal de Origen</label>
                                 <select name="sucursal_origen_id" class="w-full border rounded p-2" required>
@@ -76,7 +69,6 @@
                                 </select>
                             </div>
 
-                            <!-- Sucursal de Destino -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Sucursal de Destino</label>
                                 <select name="sucursal_destino_id" class="w-full border rounded p-2" required>
@@ -87,84 +79,39 @@
                                 </select>
                             </div>
                         </div>
-                    
-                            <!-- Campos ocultos para enviar resumen -->
-                            <input type="hidden" name="total_cantidad" :value="totalCantidad">
-                            <input type="hidden" name="total_precio_unitario" :value="totalPrecioUnitario">
-                            <input type="hidden" name="total_total" :value="totalTotal">
-                        <!-- Folios -->
-                        <div class="form-group mt-6" >
-                            <label for="folios_almonedas" class="block text-sm font-medium text-gray-700 mb-2">Folios de Almonedas</label>
-                            <div class="flex gap-2 mb-2">
-                                <input 
-                                    type="text" 
-                                    name="folios_almonedas" 
-                                    id="folios_almonedas"
-                                    x-model="folioInput"
-                                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg"
-                                    placeholder="Ej: 123, 456, 789"
-                                    autocomplete="off"
-                                    @keydown.enter.prevent="buscarFolios"
-                                >
-                                <button type="button" @click="buscarFolios" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-                                    Buscar Folios
-                                </button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Folios</label>
+                                <input type="text" x-model="folios" name="folios" placeholder="Ej. 2256,2254,2289" class="w-full border rounded p-2" />
                             </div>
-
-                            <template x-if="cargando">
-                                <div class="text-center text-indigo-600 mb-4">
-                                    <span class="animate-pulse">Cargando folios...</span>
-                                </div>
-                            </template>
-
-                            <template x-if="error">
-                                <div class="text-red-600 font-medium mb-2" x-text="error"></div>
-                            </template>
-
-                            <div class="overflow-x-auto" x-show="folios.length">
-                                <table class="min-w-full table-auto text-sm text-left text-gray-700">
-                                    <thead>
-                                        <tr class="bg-indigo-600 text-white">
-                                            <th class="px-4 py-2">Folio</th>
-                                            <th class="px-4 py-2">Cantidad</th>
-                                            <th class="px-4 py-2">Precio Unitario</th>
-                                            <th class="px-4 py-2">Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <template x-for="(folio, index) in folios" :key="index">
-                                            <tr class="border-b">
-                                                <td class="px-4 py-2" x-text="folio.folio"></td>
-                                                <td class="px-4 py-2" x-text="formatNumber(folio.cantidad)"></td>
-                                                <td class="px-4 py-2" x-text="formatCurrency(folio.precio_unitario)"></td>
-                                                <td class="px-4 py-2" x-text="formatCurrency(folio.total)"></td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                    <tfoot class="font-semibold bg-gray-100">
-                                        <tr>
-                                            <td class="px-4 py-2 text-right" colspan="1">Totales:</td>
-                                            <td class="px-4 py-2" x-text="formatNumber(totalCantidad)"></td>
-                                            <td class="px-4 py-2" x-text="formatCurrency(totalPrecioUnitario)"></td>
-                                            <td class="px-4 py-2" x-text="formatCurrency(totalTotal)"></td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Cantidad</label>
+                                <input type="number" x-model.number="cantidad" name="cantidad" class="w-full border rounded p-2" />
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Precio Unitario</label>
+                                <input type="number" x-model.number="precio" name="precio_unitario" class="w-full border rounded p-2" />
                             </div>
                         </div>
 
-                        <!-- Botón para guardar -->
-                        <div class="mt-4 text-center">
-                            <button type="submit" class="w-full px-4 py-2 rounded transition-colors duration-200" 
-                            :class="cargando ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'" 
-                            :disabled="cargando" :click="mostrarOverlayYEnviar()">
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium text-gray-700">Total</label>
+                            <input type="text" :value="formatearMoneda(total)" readonly name="total" class="w-full border rounded p-2 bg-gray-100" />
+                        </div>
+
+                        <div class="mt-6 text-center">
+                            <button type="button"
+                                class="w-full px-4 py-2 rounded transition-colors duration-200"
+                                :class="cargando ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-500 hover:bg-blue-600 text-white'"
+                                :disabled="cargando"
+                                @click="mostrarOverlayYEnviar()">
                                 <span x-show="!cargando">Guardar Traslado</span>
-                                <span x-show="cargando">Generando el PDF...</span>
-                           
-                            <svg x-show="cargando" class="animate-spin h-5 w-5 text-white inline-block ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-                            </svg>
+                                <span x-show="cargando">Guardando...</span>
+                                <svg x-show="cargando" class="animate-spin h-5 w-5 text-white inline-block ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+                                </svg>
                             </button>
                         </div>
                     </form>
@@ -173,66 +120,32 @@
         </div>
     </div>
 </div>
-<!-- Overlay de carga de PDF -->
-<!-- <div 
-    x-show="!guardando" 
-    x-cloak
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-    style="backdrop-filter: blur(4px);[x-cloak] { display: none; }"
->
-    <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-        <svg class="w-10 h-10 text-indigo-600 animate-spin mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
-        </svg>
-        <p class="text-gray-700 font-medium">Generando el PDF...</p>
-    </div>
-</div> -->
-<?php if (isset($_GET['mensaje']) && $_GET['mensaje'] === 'pdf-ok'): ?>
-    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-    <script>
-        
-        // Mostrar el toast
-        Toastify({
-            text: "📄 PDF generado correctamente",
-            duration: 4000,
-            gravity: "bottom", // `top` or `bottom`
-            position: "right",
-            backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
-        }).showToast();
-
-        // Esperar 1 seg y lanzar descarga automática
-        setTimeout(() => {
-            window.location.href = "./../descargar_pdf.php";
-        }, 1000);
-    </script>
-<?php endif; ?>
-
 
 <script>
-function foliosAlmonedas() {
+function trasladoForm() {
     return {
-        folioInput: '',
-        folios: [],
-        cargandoFolios: false,
+        folios: '',
+        cantidad: 0,
+        precio: 0,
         cargando: false,
-        guardando: false, // Nuevo estado para "Guardando datos"
-        error: '',
-        generandoPDF: false,
 
-        get totalCantidad() {
-            return this.folios.reduce((acc, f) => acc + parseFloat(f.cantidad || 0), 0);
+        get total() {
+            return this.cantidad * this.precio;
         },
-        get totalPrecioUnitario() {
-            return this.folios.reduce((acc, f) => acc + parseFloat(f.precio_unitario || 0), 0);
-        },
-        get totalTotal() {
-            return this.folios.reduce((acc, f) => acc + parseFloat(f.total || 0), 0);
+
+        formatearMoneda(valor) {
+            return Number(valor).toLocaleString('es-MX', {
+                style: 'currency',
+                currency: 'MXN',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
         },
 
         mostrarOverlayYEnviar() {
-            this.guardando = true; // Activar indicador de guardando
-            fetch('./../includes/guardar_traslado.php', {
+            this.cargando = true;
+
+            fetch('./../includes/create_logic.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -240,54 +153,45 @@ function foliosAlmonedas() {
                 },
                 body: JSON.stringify({
                     folios: this.folios,
-                    totalCantidad: this.totalCantidad,
-                    totalPrecioUnitario: this.totalPrecioUnitario,
-                    totalTotal: this.totalTotal
+                    totalCantidad: this.cantidad,
+                    totalPrecioUnitario: this.precio,
+                    totalTotal: this.total
                 })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    toastr.success('Traslado guardado exitosamente');
-                    this.limpiarCampos(); // Limpiar los campos después de guardar
+                    Toastify({
+                        text: "Traslado guardado exitosamente",
+                        duration: 3000,
+                        gravity: "top",
+                        position: 'right',
+                        backgroundColor: "linear-gradient(to right, #00b09b, #96c93d)",
+                    }).showToast();
+                    this.cargando = false;
+                    this.limpiarCampos();
                 } else {
-                    toastr.error(data.error || 'Error al guardar el traslado');
+                    Toastify({
+                        text: data.error || 'Error al guardar el traslado',
+                        duration: 3000,
+                        gravity: "top",
+                        position: 'right',
+                        backgroundColor: "linear-gradient(to right, #FF0000, #FF4500)",
+                    }).showToast();
+                    this.cargando = false;
+                    console.error(data.error || 'Error al guardar el traslado');
                 }
             })
             .catch(err => {
-                toastr.error('Error al procesar la solicitud');
-                console.error(err);
-            })
-            .finally(() => {
-                this.guardando = false; // Desactivar indicador de guardando
-            });
-        },
-
-        buscarFolios() {
-            this.cargando = true;
-            this.error = '';
-            this.folios = [];
-
-            fetch('./../includes/buscar_folios_mysql.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ folios: this.folioInput })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) {
-                    this.error = data.error;
-                    this.folios = [];
-                } else {
-                    this.folios = data.folios || [];
-                }
-            })
-            .catch(err => {
-                this.error = 'Error al consultar los folios';
-                console.error(err);
+                Toastify({
+                    text: "Error al procesar la solicitud",
+                    duration: 3000,
+                    gravity: "top",
+                    position: 'right',
+                    backgroundColor: "linear-gradient(to right, #FF0000, #FF4500)",
+                }).showToast();
+                this.cargando = false;
+                console.error('Error al procesar la solicitud', err);
             })
             .finally(() => {
                 this.cargando = false;
@@ -295,26 +199,10 @@ function foliosAlmonedas() {
         },
 
         limpiarCampos() {
-            // Restablecer los valores de los campos y variables
-            this.folioInput = '';
-            this.folios = [];
-            this.error = '';
-            this.cargando = false;
-            this.guardando = false;
-            this.generandoPDF = false;
-
-            // Opcional: Limpiar los campos del formulario HTML
+            this.folios = '';
+            this.cantidad = 0;
+            this.precio = 0;
             document.getElementById('trasladoForm').reset();
-        },
-
-        formatNumber(value) {
-            return Number(value).toLocaleString('es-MX');
-        },
-        formatCurrency(value) {
-            return Number(value).toLocaleString('es-MX', {
-                style: 'currency',
-                currency: 'MXN'
-            });
         }
     }
 }

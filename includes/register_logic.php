@@ -20,7 +20,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     if (empty($errors)) {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        //$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $hashed_password = $password;
 
         $stmt = $sqlite->prepare("INSERT INTO users (name, username, password, sucursal_id) VALUES (?, ?, ?, ?)");
         if ($stmt->execute([$nombre, $username, $hashed_password, $sucursal_id])) {

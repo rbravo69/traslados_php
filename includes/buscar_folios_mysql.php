@@ -48,19 +48,19 @@ try {
     }
 
     $placeholders = implode(',', array_fill(0, count($folioNumeros), '?'));
-
+         
     $query = "
-        SELECT 
-            ei.Folio AS folio,
-            COALESCE(SUM(di.pesoPiedras) + SUM(di.peso), 0) AS cantidad,
-            COALESCE(SUM(di.avaluo) / NULLIF((SUM(di.pesoPiedras) + SUM(di.peso)), 0), 0) AS precio_unitario,
-            COALESCE(SUM(di.avaluo), 0) AS total
-        FROM basedatos.entradainventario ei
-        LEFT JOIN basedatos.detallesentradainventario di 
-            ON ei.ID = di.IDEntrada OR ei.ID = di.ContratoPrincipal
-        WHERE ei.Folio IN ($placeholders)
-        
-        GROUP BY ei.Folio
+         SELECT rv.foliofinanzas as 'folio',
+        format(sum(de.peso + de.pesopiedras),1) as 'cantidad',
+        format(sum(de.avaluo) / sum(de.peso + de.pesopiedras),4) as 'precio unitario',
+        format(sum(de.avaluo) / sum(de.peso + de.pesopiedras) * sum(de.peso + de.pesopiedras),2) as 'total'
+
+        FROM basedatos.detallesrevfinanzas  as de 
+        left join basedatos.detallesrevfinanzas df on df.idrevfinanzas = de.idfinanzas 
+        and de.fechaTraslado is not null and de.tipoSalida=2
+        left join basedatos.revfinanzas as rv on rv.id = de.idfinanzas
+        where  rv.foliofinanzas in($placeholders)
+        group by rv.foliofinanzas
     ";
 
     $stmt = $mysql->prepare($query);

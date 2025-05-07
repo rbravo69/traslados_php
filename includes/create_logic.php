@@ -1,21 +1,27 @@
 <?php
 require_once __DIR__ .'/../config.php';
 require_once __DIR__ .'/functions.php'; // Agregamos las funciones de seguridad
-
 require_once __DIR__ .'/auth.php'; // Verifica si el usuario está logueado
 requireLogin(); // Si no está autenticado, redirige al login
 include  __DIR__ .'/../generate_pdf.php'; // incluir el generate_pdf.php
-require_once __DIR__. '/../send_mail.php'; // incluir el send_mail.php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
+ob_start(); // Empieza buffer para capturar errores
+//envio por el formulario de POST
+if($_SERVER['REQUEST_METHOD'] !=='POST') {
+    header('Location: ../templates/traslados.php');
+    exit;
+}
 // Obtener datos necesarios
 $empresas = $sqlite->query("SELECT * FROM empresas")->fetchAll(PDO::FETCH_ASSOC);
 $vehiculos = $sqlite->query("SELECT * FROM vehiculos")->fetchAll(PDO::FETCH_ASSOC);
 $personal = $sqlite->query("SELECT * FROM personal_traslados")->fetchAll(PDO::FETCH_ASSOC);
 
-
 // Obtener la sucursal del usuario
 $sucursal_usuario = $_SESSION['sucursal_id'];
-
 // 🔹 Obtener la sucursal de origen (Solo su sucursal si no es Admin)
 if ($sucursal_usuario != 1) {
     $stmt = $sqlite->prepare("SELECT * FROM sucursales WHERE id = ?");
@@ -35,7 +41,6 @@ if($sucursal_usuario == 1){
 }
 $sucursales_destino = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
 $errors = [];
 $success = "";
 
@@ -53,10 +58,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $personal_id = sanitizeInput($_POST['personal_id'] ?? '');
     $sucursal_origen_id = sanitizeInput($_POST['sucursal_origen_id'] ?? '');
     $sucursal_destino_id = sanitizeInput($_POST['sucursal_destino_id'] ?? '');
-    $folios_almonedas = sanitizeInput($_POST['folios_almonedas'] ?? '');
-    $total_cantidad = sanitizeInput($_POST['total_cantidad'] ?? '');
-    $total_precio = sanitizeInput($_POST['total_precio_unitario'] ?? '');
-    $total_total = sanitizeInput($_POST['total_total'] ?? '');
+    $folios_almonedas = sanitizeInput($_POST['folios'] ?? '');
+    $total_cantidad = sanitizeInput($_POST['totalCantidad'] ?? '');
+    $total_precio = sanitizeInput($_POST['totalPrecioUnitario'] ?? '');
+    $total_total = sanitizeInput($_POST['totalTotal'] ?? '');
 
     // Validar campos obligatorios
     if (empty($empresa_id) || empty($fecha_traslado) || empty($vehiculo_id) || empty($personal_id) || empty($sucursal_origen_id) || empty($sucursal_destino_id)) {
